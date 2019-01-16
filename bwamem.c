@@ -8,6 +8,16 @@
 #include <pthread.h>
 #endif
 
+// <<< youchihwang, 2019/01/16, computing left right length from seed before smith waterman ksw_extend2().
+#include <inttypes.h>
+int64_t total_left_length = 0;
+int64_t total_right_length = 0;
+int64_t min_left_length = 99999;
+int64_t max_left_length = 0;
+int64_t min_right_length = 99999;
+int64_t max_right_length = 0;
+// >>> youchihwang, 2019/01/16, computing left right length from seed before smith waterman ksw_extend2().
+
 #include "kstring.h"
 #include "bwamem.h"
 #include "bntseq.h"
@@ -718,6 +728,13 @@ void mem_chain2aln(const mem_opt_t *opt, const bntseq_t *bns, const uint8_t *pac
 			qs = malloc(s->qbeg);
 			for (i = 0; i < s->qbeg; ++i) qs[i] = query[s->qbeg - 1 - i];
 			tmp = s->rbeg - rmax[0];
+            // <<< youchihwang, 2019/01/16, computing left right length from seed before smith waterman ksw_extend2().
+            //printf("Before enter left extension \n");
+            //printf("The length from the left side of the seed to begin : %" PRId64 "\n", tmp);
+            total_left_length += tmp;
+            min_left_length = tmp < min_left_length ? tmp : min_left_length;
+            max_left_length = tmp > max_left_length ? tmp : max_left_length;
+            // >>> youchihwang, 2019/01/16, computing left right length from seed before smith waterman ksw_extend2().
 			rs = malloc(tmp);
 			for (i = 0; i < tmp; ++i) rs[i] = rseq[tmp - 1 - i];
 			for (i = 0; i < MAX_BAND_TRY; ++i) {
@@ -748,6 +765,13 @@ void mem_chain2aln(const mem_opt_t *opt, const bntseq_t *bns, const uint8_t *pac
 			qe = s->qbeg + s->len;
 			re = s->rbeg + s->len - rmax[0];
 			assert(re >= 0);
+            // <<< youchihwang, 2019/01/16, computing left right length from seed before smith waterman ksw_extend2().
+            //printf("Before enter left extension \n");
+            //printf("The length from the left side of the seed to begin : %" PRId64 "\n", rmax[1] - rmax[0] - re);
+            total_right_length += (rmax[1] - rmax[0] - re);
+            min_right_length = (rmax[1] - rmax[0] - re) < min_right_length ? (rmax[1] - rmax[0] - re) : min_right_length;
+            max_right_length = (rmax[1] - rmax[0] - re) > max_right_length ? (rmax[1] - rmax[0] - re) : max_right_length;
+            // >>> youchihwang, 2019/01/16, computing left right length from seed before smith waterman ksw_extend2().
 			for (i = 0; i < MAX_BAND_TRY; ++i) {
 				int prev = a->score;
 				aw[1] = opt->w << i;

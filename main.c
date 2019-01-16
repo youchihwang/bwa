@@ -3,6 +3,11 @@
 #include "kstring.h"
 #include "utils.h"
 
+// <<< youchihwang, 2019/01/16, computing left right length from seed before smith waterman ksw_extend2().
+#include <inttypes.h>
+#include <time.h>
+// >>> youchihwang, 2019/01/16, computing left right length from seed before smith waterman ksw_extend2().
+
 #ifndef PACKAGE_VERSION
 #define PACKAGE_VERSION "0.7.17-r1194-dirty"
 #endif
@@ -58,6 +63,16 @@ static int usage()
 	return 1;
 }
 
+// <<< youchihwang, 2019/01/16, computing left right length from seed before smith waterman ksw_extend2().
+extern int extern_n_seqs;
+extern int64_t total_left_length;
+extern int64_t total_right_length;
+extern int64_t max_left_length;
+extern int64_t min_left_length;
+extern int64_t max_right_length;
+extern int64_t min_right_length;
+// >>> youchihwang, 2019/01/16, computing left right length from seed before smith waterman ksw_extend2().
+
 int main(int argc, char *argv[])
 {
 	extern char *bwa_pg;
@@ -90,6 +105,47 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "[main] unrecognized command '%s'\n", argv[1]);
 		return 1;
 	}
+
+    // <<< youchihwang, 2019/01/16, computing left right length from seed before smith waterman ksw_extend2().
+    FILE * fp_w = fopen("bohao", "a+w");
+    time_t nowtime;
+    nowtime = time(NULL);
+    char tmp[64];
+    strftime(tmp, sizeof(tmp), "%Y-%m-%d %H %M %S", localtime(&nowtime));
+
+    if (fp_w == NULL)
+        return -1;
+
+    // printf("\n");
+    // printf("\n");
+    // printf("min left length : %" PRId64 "\n", min_left_length);
+    // printf("max left length : %" PRId64 "\n", max_left_length);
+    // printf("min right length : %" PRId64 "\n", min_right_length);
+    // printf("max right length : %" PRId64 "\n", max_right_length);
+    // printf("The total read : %d \n", extern_n_seqs);
+    // printf("The total left length : %" PRId64 "\n", total_left_length);
+    // printf("The total right length : %" PRId64 "\n", total_right_length);
+    // printf("The average left length of each read : %" PRId64 "\n", total_left_length/extern_n_seqs);
+    // printf("The average right length of each read : %" PRId64 "\n", total_right_length/extern_n_seqs);
+    // printf("\n");
+    // printf("\n");
+
+    fprintf(fp_w, "\n");
+    fprintf(fp_w, "date time : %s \n", tmp);
+    fprintf(fp_w, "min left length : %" PRId64 "\n", min_left_length);
+    fprintf(fp_w, "max left length : %" PRId64 "\n", max_left_length);
+    fprintf(fp_w, "min right length : %" PRId64 "\n", min_right_length);
+    fprintf(fp_w, "max right length : %" PRId64 "\n", max_right_length);
+    fprintf(fp_w, "The total read : %d \n", extern_n_seqs);
+    fprintf(fp_w, "The total left length : %" PRId64 "\n", total_left_length);
+    fprintf(fp_w, "The total right length : %" PRId64 "\n", total_right_length);
+    fprintf(fp_w, "The average left length of each read : %" PRId64 "\n", total_left_length/extern_n_seqs);
+    fprintf(fp_w, "The average right length of each read : %" PRId64 "\n", total_right_length/extern_n_seqs);
+    fprintf(fp_w, "\n");
+
+    fclose(fp_w);
+    // >>> youchihwang, 2019/01/16, computing left right length from seed before smith waterman ksw_extend2().
+
 	err_fflush(stdout);
 	err_fclose(stdout);
 	if (ret == 0) {

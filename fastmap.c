@@ -35,6 +35,10 @@ typedef struct {
 	bseq1_t *seqs;
 } ktp_data_t;
 
+// <<< youchihwang, 2019/01/16, computing left right length from seed before smith waterman ksw_extend2().
+int extern_n_seqs;
+// >>> youchihwang, 2019/01/16, computing left right length from seed before smith waterman ksw_extend2().
+
 static void *process(void *shared, int step, void *_data)
 {
 	ktp_aux_t *aux = (ktp_aux_t*)shared;
@@ -55,6 +59,11 @@ static void *process(void *shared, int step, void *_data)
 				ret->seqs[i].comment = 0;
 			}
 		for (i = 0; i < ret->n_seqs; ++i) size += ret->seqs[i].l_seq;
+
+        // <<< youchihwang, 2019/01/16, computing left right length from seed before smith waterman ksw_extend2().
+        extern_n_seqs = ret->n_seqs;
+        // >>> youchihwang, 2019/01/16, computing left right length from seed before smith waterman ksw_extend2().
+
 		if (bwa_verbose >= 3)
 			fprintf(stderr, "[M::%s] read %d sequences (%ld bp)...\n", __func__, ret->n_seqs, (long)size);
 		return ret;
